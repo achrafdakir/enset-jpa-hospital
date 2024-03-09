@@ -27,7 +27,9 @@ public class JpaHospitalApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         for (int i = 0; i < 100; i++) {
-            patientRepository.save(new Patient(null,"Achraf",new Date(),false,(int)(Math.random()*100)));
+            patientRepository.save(
+                    new Patient(null,"Achraf",new Date(),
+                            false,(int)(Math.random()*100)));
         }
 
         System.out.println("------------------");
