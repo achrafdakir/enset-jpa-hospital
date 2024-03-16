@@ -1,53 +1,68 @@
 package ma.enset.jpahospital;
 
-import ma.enset.jpahospital.entities.Patient;
+import ma.enset.jpahospital.entities.*;
+import ma.enset.jpahospital.repositories.ConsultationRepository;
+import ma.enset.jpahospital.repositories.MedecinRepository;
 import ma.enset.jpahospital.repositories.PatientRepository;
+import ma.enset.jpahospital.repositories.RendezVousRepository;
+import ma.enset.jpahospital.service.IHospitalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @SpringBootApplication
-public class JpaHospitalApplication implements CommandLineRunner {
+public class JpaHospitalApplication {
 
-    @Autowired
-    private PatientRepository patientRepository;
 
     public static void main(String[] args) {
 
         SpringApplication.run(JpaHospitalApplication.class, args);
     }
 
-    @Override
-    public void run(String... args) throws Exception {
-        for (int i = 0; i < 100; i++) {
-            patientRepository.save(
-                    new Patient(null,"Achraf",new Date(),
-                            Math.random()>0.5?true:false,(int)(Math.random()*100)));
-        }
+    @Bean
+    CommandLineRunner start(IHospitalService hospitalService, RendezVousRepository rendezVousRepository){
+        return args -> {
+            Stream.of("anas","ali","fati").forEach(name ->{
+                Patient patient = new Patient();
+                patient.setNom(name);
+                patient.setDateNaissance(new Date());
+                patient.setMalade(false);
+                patient.setScore(50);
+                hospitalService.savePatient(patient);
+            });
+            Stream.of("IKRAM","SAAD","YAHYA").forEach(name ->{
+                Medecin medecin = new Medecin();
+                medecin.setNom(name);
+                medecin.setEmail(name+"@gmail.com");
+                medecin.setSpecialite(Math.random()>0.5?"generale":"dentiste");
+                hospitalService.saveMedecin(medecin);
+            });
 
-        System.out.println("------------------");
-        Patient p = patientRepository.findById(2L).orElse(null);
-        System.out.println(p.toString());
-        p.setScore(100);
-        patientRepository.save(p);
-        patientRepository.deleteById(1L);
-        Page<Patient> patients = patientRepository.findAll(PageRequest.of(1,5));
-        System.out.println("Total pages :"+patients.getTotalPages());
-        System.out.println("Total elements :"+patients.getTotalElements());
-        System.out.println("Num Page : "+patients.getNumber());
-        List<Patient> content = patients.getContent();
+            Patient patient1 = hospitalService.findPatientByNom("anas");
+            Medecin medecin1 = hospitalService.findMedecinByNom("SAAD");
 
-        Page<Patient> byMalade = patientRepository.findByMalade(true, PageRequest.of(0,5));
-        System.out.println("====================");
-        byMalade.forEach(patient ->{
-            System.out.println(patient.toString());
-        });
+            RendezVous rendezVous = new RendezVous();
+            rendezVous.setDate(new Date());
+            rendezVous.setStatus(StatusRDV.PENDING);
+            rendezVous.setPatient(patient1);
+            rendezVous.setMedecin(medecin1);
+            hospitalService.saveRDV(rendezVous);
+
+            RendezVous rendezVous1 = rendezVousRepository.findById(1L).orElse(null);
+            Consultation consultation = new Consultation();
+            consultation.setDateConsultation(rendezVous1.getDate());
+            consultation.setRendezVous(rendezVous1);
+            consultation.setRapport("Rapport de consultation ......");
+            hospitalService.saveConsultation(consultation);
+        };
     }
 }

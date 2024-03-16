@@ -16,3 +16,13 @@ Resultat :
 <img src="pictures/h2.png">
 <h3>Mysql database</h3>
 <img src="pictures/mysql.png">
+<h3>Patient, Medecin, RendezVous, Consultation</h3>
+<img src="pictures/shema.png">
+<h4>Patient</h4>
+<img src="pictures/entityPatient.png">
+<h4>Medecin</h4>
+<img src="pictures/medecin.png">
+<h4>Rendez Vous</h4>
+<img src="pictures/rendezVous.png">
+<h4>Consultation</h4>
+<img src="pictures/consultation.png">
