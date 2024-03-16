@@ -29,7 +29,7 @@ public class JpaHospitalApplication implements CommandLineRunner {
         for (int i = 0; i < 100; i++) {
             patientRepository.save(
                     new Patient(null,"Achraf",new Date(),
-                            false,(int)(Math.random()*100)));
+                            Math.random()>0.5?true:false,(int)(Math.random()*100)));
         }
 
         System.out.println("------------------");
@@ -43,8 +43,10 @@ public class JpaHospitalApplication implements CommandLineRunner {
         System.out.println("Total elements :"+patients.getTotalElements());
         System.out.println("Num Page : "+patients.getNumber());
         List<Patient> content = patients.getContent();
+
+        Page<Patient> byMalade = patientRepository.findByMalade(true, PageRequest.of(0,5));
         System.out.println("====================");
-        content.forEach(patient ->{
+        byMalade.forEach(patient ->{
             System.out.println(patient.toString());
         });
     }
